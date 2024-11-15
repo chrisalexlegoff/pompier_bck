@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -34,6 +36,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'boolean')]
     private bool $isVerified = false;
+
+    /**
+     * @var Collection<int, Command>
+     */
+    #[ORM\OneToMany(targetEntity: Command::class, mappedBy: 'client')]
+    private Collection $command;
+
+    /**
+     * @var Collection<int, Loan>
+     */
+    #[ORM\OneToMany(targetEntity: Loan::class, mappedBy: 'client')]
+    private Collection $loans;
+
+    public function __construct()
+    {
+        $this->command = new ArrayCollection();
+        $this->loans = new ArrayCollection();
+    }
 
     public function isVerified(): bool
     {
@@ -119,5 +139,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Command>
+     */
+    public function getCommand(): Collection
+    {
+        return $this->command;
+    }
+
+    public function addCommand(Command $command): static
+    {
+        if (!$this->command->contains($command)) {
+            $this->command->add($command);
+            $command->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommand(Command $command): static
+    {
+        if ($this->command->removeElement($command)) {
+            // set the owning side to null (unless already changed)
+            if ($command->getClient() === $this) {
+                $command->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Loan>
+     */
+    public function getLoans(): Collection
+    {
+        return $this->loans;
+    }
+
+    public function addLoan(Loan $loan): static
+    {
+        if (!$this->loans->contains($loan)) {
+            $this->loans->add($loan);
+            $loan->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLoan(Loan $loan): static
+    {
+        if ($this->loans->removeElement($loan)) {
+            // set the owning side to null (unless already changed)
+            if ($loan->getClient() === $this) {
+                $loan->setClient(null);
+            }
+        }
+
+        return $this;
     }
 }
