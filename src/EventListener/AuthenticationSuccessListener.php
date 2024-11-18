@@ -16,9 +16,7 @@ class AuthenticationSuccessListener
             return;
         }
 
-        $data['payload'] = array(
-            'isVerified' => $user->isVerified(),
-        );
+        $data['isVerified'] =  $user->isVerified();
 
         $event->setData($data);
     }
