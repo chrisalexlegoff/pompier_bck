@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Category;
+use App\Entity\MaterialCat;
+use App\Entity\ProductCat;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -41,7 +43,13 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Categorie', 'fab fa-canadian-maple-leaf', Category::class);
+        return [
+            MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
+            MenuItem::subMenu('Categories', 'fa fa-list')->setSubItems([
+                MenuItem::linkToCrud('Principale', 'fab fa-android', Category::class),
+                MenuItem::linkToCrud('Matériels', 'fab fa-avianex', MaterialCat::class),
+                MenuItem::linkToCrud('Produits', 'fab fa-black-tie', ProductCat::class),
+            ]),
+        ];
     }
 }
