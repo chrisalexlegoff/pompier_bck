@@ -19,6 +19,7 @@ class Material
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'materials')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?MaterialCat $matCategory = null;
 
     /**
@@ -104,5 +105,9 @@ class Material
         $this->stock = $stock;
 
         return $this;
+    }
+    public function __toString(): string
+    {
+        return $this->name;
     }
 }

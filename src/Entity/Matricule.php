@@ -3,9 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\MatriculeRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: MatriculeRepository::class)]
+#[UniqueEntity(fields:['matricule'], message: 'Ce matricule existe déjà')]
 class Matricule
 {
     #[ORM\Id]
@@ -13,10 +16,11 @@ class Matricule
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 25)]
+    #[ORM\Column(length: 25, unique: true)]
     private ?string $matricule = null;
 
-    #[ORM\OneToOne(cascade: ['persist'])]
+    #[ORM\OneToOne()]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $client = null;
 
     public function getId(): ?int
