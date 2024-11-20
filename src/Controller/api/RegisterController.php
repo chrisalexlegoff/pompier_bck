@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\api;
+namespace App\Controller\Api;
 
 use App\Entity\User;
 use Symfony\Component\Mime\Email;

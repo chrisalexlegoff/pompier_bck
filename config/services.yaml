@@ -26,3 +26,8 @@ services:
     class: App\EventListener\AuthenticationSuccessListener
     tags:
       - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }
+
+  App\EventListener\EntityTimestampListener:
+    tags:
+      - { name: doctrine.event_listener, event: prePersist }
+      - { name: doctrine.event_listener, event: preUpdate }

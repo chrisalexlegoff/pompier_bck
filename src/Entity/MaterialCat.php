@@ -19,12 +19,14 @@ class MaterialCat
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'materialCats')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     /**
      * @var Collection<int, Material>
      */
     #[ORM\OneToMany(targetEntity: Material::class, mappedBy: 'matCategory')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private Collection $materials;
 
     public function __construct()
@@ -89,5 +91,9 @@ class MaterialCat
         }
 
         return $this;
+    }
+    public function __toString(): string
+    {
+        return $this->name;
     }
 }

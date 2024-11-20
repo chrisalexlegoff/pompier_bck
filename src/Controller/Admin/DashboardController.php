@@ -3,8 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Category;
+use App\Entity\Loan;
+use App\Entity\Material;
 use App\Entity\MaterialCat;
+use App\Entity\Matricule;
+use App\Entity\Product;
 use App\Entity\ProductCat;
+use App\Entity\Stock;
+use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -45,11 +51,19 @@ class DashboardController extends AbstractDashboardController
     {
         return [
             MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
+            MenuItem::subMenu('Espace membres', 'fas fa-memory')->setSubItems([
+                MenuItem::linkToCrud('Membres', 'fas fa-user-astronaut', User::class),
+                MenuItem::linkToCrud('Matricules', 'fab fa-creative-commons-nd', Matricule::class),
+            ]),
             MenuItem::subMenu('Categories', 'fa fa-list')->setSubItems([
                 MenuItem::linkToCrud('Principale', 'fab fa-android', Category::class),
                 MenuItem::linkToCrud('Matériels', 'fab fa-avianex', MaterialCat::class),
                 MenuItem::linkToCrud('Produits', 'fab fa-black-tie', ProductCat::class),
             ]),
+            MenuItem::linkToCrud('Produits', 'fab fa-product-hunt', Product::class),
+            MenuItem::linkToCrud('Matériels', 'fab fa-product-hunt', Material::class),
+            MenuItem::linkToCrud('Stock', 'fas fa-store', Stock::class),
+            MenuItem::linkToCrud('Emprunts', 'fab fa-d-and-d', Loan::class),
         ];
     }
 }

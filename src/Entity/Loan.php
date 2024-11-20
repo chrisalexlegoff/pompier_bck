@@ -20,9 +20,11 @@ class Loan
     private ?\DateTimeImmutable $returnAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'loans')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Material $material = null;
 
     #[ORM\ManyToOne(inversedBy: 'loans')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $client = null;
 
     public function getId(): ?int
@@ -76,5 +78,10 @@ class Loan
         $this->client = $client;
 
         return $this;
+    }
+
+    public function getMaterialStock(): ?int
+    {
+        return $this->material ? $this->material->getStock()->getQuantity(): null;
     }
 }

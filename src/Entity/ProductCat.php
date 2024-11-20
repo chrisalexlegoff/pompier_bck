@@ -2,12 +2,17 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductCatRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use App\Repository\ProductCatRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: ProductCatRepository::class)]
+#[ApiResource(
+    normalizationContext: ['groups' => ['category:read']],
+    denormalizationContext: ['groups' => ['category:write']]
+)]
 class ProductCat
 {
     #[ORM\Id]
@@ -22,9 +27,11 @@ class ProductCat
      * @var Collection<int, Product>
      */
     #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'productCat')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private Collection $produits;
 
     #[ORM\ManyToOne(inversedBy: 'productCats')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     public function __construct()
@@ -89,5 +96,10 @@ class ProductCat
         $this->category = $category;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name;
     }
 }
