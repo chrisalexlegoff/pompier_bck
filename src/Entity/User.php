@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER', fields: ['identifiant'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -59,6 +60,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $lastName = null;
+
+    #[ORM\ManyToOne(targetEntity: Matricule::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Matricule $matricule = null;
 
     public function __construct()
     {
@@ -179,6 +184,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+        return $this;
+    }
+
+
+    /**
+     *
+     * @return Matricule|null
+     */
+    public function getMatricule(): ?Matricule
+    {
+        return $this->matricule;
+    }
+
+    /**
+     *
+     * @param Matricule|null $matricule
+     * @return self
+     */
+    public function setMatricule(?Matricule $matricule): self
+    {
+        $this->matricule = $matricule;
         return $this;
     }
 

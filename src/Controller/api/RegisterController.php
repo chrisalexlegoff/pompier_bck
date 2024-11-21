@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Entity\User;
-use Symfony\Component\Mime\Email;
+use App\Repository\MatriculeRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class RegisterController extends AbstractController
@@ -34,17 +35,39 @@ class RegisterController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        UserRepository $userRepository,
+        MatriculeRepository $matriculeRepository
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
-        // Création et validation de l'utilisateur
-        $user = new User();
-        // $user->setUsername($data['username'] ?? '');
-        $user->setEmail($data['email'] ?? '');
-        $user->setPassword($passwordHasher->hashPassword($user, $data['password'] ?? ''));
+       
+        // Validation des champs requis
+        if (!isset($data['email'], $data['password'], $data['firstName'], $data['lastName'], $data['identifiant'], $data['matricule'])) {
+            return new JsonResponse(['message' => 'Tous les champs requis doivent être renseignés.'], 400);
+        }
 
-        // Validation des données
+        // Vérification que l'identifiant est unique
+        if ($userRepository->findOneBy(['identifiant' => $data['identifiant']])) {
+            return new JsonResponse(['message' => 'Cet identifiant est déjà utilisé.'], 400);
+        }
+
+        // Vérification que le matricule existe
+        $matricule = $matriculeRepository->findOneBy(['matricule' => $data['matricule']]);
+        if (!$matricule) {
+            return new JsonResponse(['message' => 'Matricule invalide.'], 400);
+        }
+
+        // Création de l'utilisateur
+        $user = new User();
+        $user->setEmail($data['email']);
+        $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
+        $user->setFirstName($data['firstName']);
+        $user->setLastName($data['lastName']);
+        $user->setIdentifiant($data['identifiant']);
+        $user->setMatricule($matricule);
+
+        // Validation de l'entité User
         $errors = $validator->validate($user);
         if (count($errors) > 0) {
             $errorMessages = [];
@@ -54,7 +77,7 @@ class RegisterController extends AbstractController
             return new JsonResponse(['message' => implode(", ", $errorMessages)], 400);
         }
 
-        // Sauvegarde de l'utilisateur sans vérification
+        // Sauvegarde de l'utilisateur
         $entityManager->persist($user);
         $entityManager->flush();
 
@@ -73,7 +96,7 @@ class RegisterController extends AbstractController
             ->from('noreply@yourdomain.com')
             ->to($user->getEmail())
             ->subject('Veuillez vérifier votre email')
-            ->html(sprintf('<p>Merci de confirmer votre adresse email en cliquant <a href="%s">ici</a></p>', $verificationUrl));
+            ->html(sprintf('<p>Merci de confirmer votre adresse email en cliquant <a href="%s">ici</a>.</p>', $verificationUrl));
 
         $this->mailer->send($email);
 
@@ -96,7 +119,7 @@ class RegisterController extends AbstractController
         }
 
         try {
-            $this->verifyEmailHelper->validateEmailConfirmationFromRequest ($request, (string) $user->getId(), $user->getEmail());
+            $this->verifyEmailHelper->validateEmailConfirmationFromRequest($request, (string) $user->getId(), $user->getEmail());
             $user->setIsVerified(true);
             $entityManager->persist($user);
             $entityManager->flush();
@@ -107,4 +130,3 @@ class RegisterController extends AbstractController
         return new JsonResponse(['message' => 'Email vérifié avec succès.'], 200);
     }
 }
-
