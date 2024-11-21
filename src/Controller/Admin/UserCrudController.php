@@ -7,7 +7,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\{Action, Actions, Crud, KeyValueStore
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
-use EasyCorp\Bundle\EasyAdminBundle\Field\{BooleanField, ChoiceField, IdField, EmailField, TextField};
+use EasyCorp\Bundle\EasyAdminBundle\Field\{AssociationField, BooleanField, ChoiceField, IdField, EmailField, TextField};
 use Symfony\Component\Form\Extension\Core\Type\{PasswordType, RepeatedType};
 use Symfony\Component\Form\{FormBuilderInterface, FormEvent, FormEvents};
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -43,7 +43,8 @@ class UserCrudController extends AbstractCrudController
             TextField::new('lastName'),
             EmailField::new('email'),
             // ChoiceField::new('roles')->hideOnForm()->allowMultipleChoices(),
-            BooleanField::new('isverified')
+            BooleanField::new('isverified'),
+            AssociationField::new('matricule')->setCrudController(MatriculeCrudController::class),
         ];
 
         $password = TextField::new('password')

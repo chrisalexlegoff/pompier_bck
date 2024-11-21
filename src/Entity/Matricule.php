@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\MatriculeRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,6 +10,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: MatriculeRepository::class)]
 #[UniqueEntity(fields:['matricule'], message: 'Ce matricule existe déjà')]
+#[ApiResource()]
 class Matricule
 {
     #[ORM\Id]
@@ -18,10 +20,6 @@ class Matricule
 
     #[ORM\Column(length: 25, unique: true)]
     private ?string $matricule = null;
-
-    #[ORM\OneToOne()]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    private ?User $client = null;
 
     public function getId(): ?int
     {
@@ -39,16 +37,8 @@ class Matricule
 
         return $this;
     }
-
-    public function getClient(): ?User
+    public function __toString(): string
     {
-        return $this->client;
-    }
-
-    public function setClient(?User $client): static
-    {
-        $this->client = $client;
-
-        return $this;
+        return $this->matricule;
     }
 }

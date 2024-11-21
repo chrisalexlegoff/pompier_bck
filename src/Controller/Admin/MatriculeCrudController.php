@@ -20,7 +20,6 @@ class MatriculeCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             TextField::new('matricule'),
-            AssociationField::new('client'),
         ];
     }
 }
