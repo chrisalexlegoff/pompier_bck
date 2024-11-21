@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Controller\api;
+
+use App\Entity\User;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\HttpFoundation\Response;
+
+class ApiLoginController extends AbstractController
+{
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
+    public function index(#[CurrentUser] ?User $user, JWTTokenManagerInterface $JWTManager): Response
+    {
+        if (null === $user) {
+            return $this->json([
+                'message' => 'missing credentials',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        // Génère le jeton JWT pour l'utilisateur
+        $token = $JWTManager->create($user);
+
+        return $this->json([
+            'message' => 'Bienvenue dans votre contrôleur API !',
+            'user' => $user->getUserIdentifier(),
+            'token' => $token,
+        ]);
+    }
+}

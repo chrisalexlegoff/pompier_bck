@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProductCatRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductCatRepository::class)]
 #[ApiResource(
@@ -18,9 +19,11 @@ class ProductCat
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 25)]
+    #[Groups(['product:read'])]
     private ?string $name = null;
 
     /**
